@@ -395,6 +395,9 @@ class Subsite_Control_Panel {
 	 */
 	public function sanitize( $dirty = array() ) {
 
+		$transients = new Transients;
+		$transients -> delete();
+
 		// Will hold cleaned values.
 		$clean = array();
 

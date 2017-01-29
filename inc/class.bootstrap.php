@@ -50,6 +50,7 @@ class Bootstrap {
 		$mailorc -> settings              = new Settings;
 		$mailorc -> meta                  = new Meta;
 		$mailorc -> enqueue               = new Enqueue;
+		$mailorc -> admin_landing_page          = new Admin_Landing_Page;				
 		$mailorc -> landing_page          = new Landing_Page;				
 		$mailorc -> subsite_control_panel = new Subsite_Control_Panel;
 		

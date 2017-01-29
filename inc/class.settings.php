@@ -43,6 +43,8 @@ class Settings {
 	 */
 	function set_settings() {
 
+		$sample_api_key = '<code>2t3g46fy4hf75k98uytr5432wer3456u-us3</code>';
+
 		$out = array(
 
 			// A section.
@@ -65,14 +67,23 @@ class Settings {
 					// A setting.
 					'api_key' => array(
 						'type'        => 'text',
-						'label'       => esc_html__( 'MailChimp API Key', 'mailorc' ),
-						'description' => esc_html__( 'Example: 2t3g46fy4hf75k98uytr5432wer3456u-us3', 'mailorc' ),
+						'label'       => esc_html__( 'API Key', 'mailorc' ),
+						'description' => sprintf( esc_html__( 'Example: %s.', 'mailorc' ), $sample_api_key ),
 						'attrs'       => array(
 							'required'    => 'required',
 							'placeholder' => esc_attr__( 'Your MailChimp API Key', 'mailorc' ),
 							'pattern'     => '.{30,40}',
 							'title'       => esc_attr__( 'Should be about 36 characters and include your datacenter', 'mailorc' ),
 						),
+					),
+
+					// A setting.
+					'list_id' => array(
+						'type'        => 'select',
+						'label'       => esc_html__( 'List', 'mailorc' ),
+						'description' => esc_html__( 'Choose a list from your account.', 'mailorc' ),
+						'options_cb'  => array( 'Fields', 'get_lists_as_options' ),
+						
 					),
 
 				),
@@ -174,6 +185,9 @@ class Settings {
 
 		$values = $this -> get_subsite_values();
 
+		if( ! isset( $values[ $section_id ] ) ) { return FALSE; }
+		if( ! isset( $values[ $section_id ][ $setting_id ] ) ) { return FALSE; }
+				
 		return $values[ $section_id ][ $setting_id ];
 
 	}

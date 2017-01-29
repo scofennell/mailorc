@@ -10,9 +10,11 @@
 
 namespace MailOrc;
 
-class Lists extends Resource {
+class Single_List extends Resource {
 
-	function __construct( $args = array() ) {
+	function __construct( string $id ) {
+
+		$this -> id = $id;
 
 		parent::__construct();
 
@@ -23,22 +25,9 @@ class Lists extends Resource {
 	 */
 	function set_endpoint() {
 
-		$this -> endpoint = 'lists';
+		$id = $this -> get_id();
 
-	}
-
-	function get_as_kv() {
-
-		$lists = $this -> get_response();
-		$lists = $lists['lists'];
-
-		foreach( $lists as $list ) {
-
-			$out[ $list['id'] ] = $list['name'];
-
-		}
-
-		return $out;
+		$this -> endpoint = "lists/$id";
 
 	}
 	

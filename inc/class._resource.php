@@ -14,11 +14,32 @@ abstract class Resource {
 
 	function __construct( $args = array() ) {
 
+		global $mailorc;
+		$this -> settings = $mailorc -> settings;
+
 		// Store the endpoint to which we're making api calls.
-		$this -> set_slug();
+		$this -> set_endpoint();
 
 		// Store the args that were passed in.
 		$this -> set_args( $args );
+
+	}
+
+	function get_id() {
+
+		return $this -> id;
+
+	}
+
+	function get_list_id() {
+
+		return $this -> list_id;
+
+	}
+
+	function get_subsite_list() {
+
+		return $this -> settings -> get_subsite_value( 'mailchimp_account_setup', 'list_id' );
 
 	}
 
@@ -27,9 +48,9 @@ abstract class Resource {
 	 * 
 	 * @return string The endpoint to which we're making API calls.
 	 */
-	function get_slug() {
+	function get_endpoint() {
 
-		return $this -> slug;
+		return $this -> endpoint;
 
 	}
 
@@ -50,7 +71,7 @@ abstract class Resource {
 	function get_response() {
 
 		$args = array(
-			'resource' => $this -> get_slug(),
+			'endpoint' => $this -> get_endpoint(),
 		);
 
 		$call = new Call( $args );
