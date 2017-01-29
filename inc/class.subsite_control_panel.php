@@ -431,20 +431,38 @@ class Subsite_Control_Panel {
 		// If the plugin is all set up, say so.
 		if( $this -> is_setup() ) {
 
-			$message = esc_html__( 'Nice!  Your API Key is valid.', 'mailorc' );
-			$type = 'success';
+			$message  = '<p>' . esc_html__( 'Nice!  Your API Key is valid.', 'mailorc' ) . '</p>';
+			$get_interests_list = $this -> get_interests_list();
+			if( empty( $get_interests_list ) ) {
+
+				$type = 'warning';
+				$message .= esc_html__( 'Now you just need to add some interests to your list!', 'mailorc' );
+
+			} else {
+			
+				$type = 'success';
+				$message .= '<p>' . esc_html__( 'Here is a list of your interests by name and id:', 'mailorc' ) . '</p>';
+				$message .= $this -> get_interests_list();
+
+				$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
+				$example_url = '<code>' . get_permalink( $landing_page_id ) . '?email=hello@world.com&interest=1234abce' . '</code>';
+				$message .= '<p>' . sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url ). '</p>';
+				
+			}
+			
+			
 
 		// Else, issue a warning.
 		} else {
 
-			$message = esc_html__( 'Please provide a valid API Key.', 'mailorc' );
-			$type = 'warning';
+			$message = '<p>' . esc_html__( 'Please provide a valid API Key.', 'mailorc' ) . '</p>';
+			$type = 'error';
 
 		}
 
 		$out = "
 			<div class='notice-$type notice is-dismissible'>
-				<p>$message</p>
+				$message
 			</div>
 		";
 
@@ -475,6 +493,18 @@ class Subsite_Control_Panel {
 		if( is_wp_error( $has_api_key ) ) { return FALSE; }
 
 		return TRUE;
+
+	}
+
+	function get_interests_list() {
+
+		$list_id = $this -> meta -> get_subsite_list();
+
+		$list = new Single_List( $list_id );
+
+		$out = $list -> get_interests_as_list();
+
+		return $out;
 
 	}
 
