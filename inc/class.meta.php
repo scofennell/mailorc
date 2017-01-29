@@ -35,11 +35,15 @@ class Meta {
 	 * 
 	 * @return mixed Returns an http response on success, a wp_error on failure.
 	 */
-	function has_api_key() {
+	function has_subsite_api_key() {
 
 		$call = new call();
 
 		$response = $call -> get_response();
+
+		if( is_wp_error( $response ) ) {
+			return new \WP_Error( 'no_api_key', 'Please provide a valid API Key.', $response );
+		}
 
 		return $response;
 
@@ -57,6 +61,12 @@ class Meta {
 		if( empty( $get_landing_page ) ) {
 			return new \WP_Error( 'no_landing_page', 'Please choose a landing page.' );
 		}
+
+		$get_page = get_page( $get_landing_page );
+
+		if( ! ( is_a( $get_page, 'WP_Post' ) ) ) {
+			return new \WP_Error( 'no_landing_page', 'Please choose a landing page.' );
+		}		
 
 		return TRUE;
 
@@ -88,12 +98,32 @@ class Meta {
 		$get_subsite_list = $this -> get_subsite_list();
 
 		if( empty( $get_subsite_list ) ) {
+
 			return new \WP_Error( 'no_subsite_list', 'Please choose a MailChimp list.' );
+	
 		}
 
 		return TRUE;
 
 	}	
+
+	function has_subsite_list_obj() {
+
+		$has_subsite_list = $this -> has_subsite_list();
+
+		if( is_wp_error( $has_subsite_list ) ) {
+			return $has_subsite_list;
+		}
+
+		$list_obj = $this -> get_subsite_list_obj();
+		$response = $list_obj -> get_response();
+		if( is_wp_error( $response ) ) {
+			return new \WP_Error( 'no_subsite_list', 'Please choose a MailChimp list.' ); 
+		}
+
+		return TRUE;
+
+	}
 
 	function get_subsite_list() {
 
@@ -107,11 +137,33 @@ class Meta {
 
 	}
 
+	function has_subsite_interests() {
+
+		$subsite_interests = $this -> get_subsite_interests();
+
+		if( is_wp_error( $subsite_interests ) ) {
+
+			return new \wp_error( 'subsite_interests', 'Your list has no interests.' );
+
+		}
+	
+		return TRUE;
+
+	}
+
 	function get_subsite_interest_categories() {
 
 		$ic = new Interest_Categories( $this -> get_subsite_list() );
-		
-		return $ic -> get_ids();
+	
+		$out = $ic -> get_ids();
+
+		$count = count( $out );
+
+		if( empty( $out ) ) {
+			return new \WP_Error( 'no_interest_categories', 'Your list has no interest categories.', $ic );
+		}
+
+		return $out;
 
 	}
 
@@ -122,6 +174,10 @@ class Meta {
 		$list_id = $this -> get_subsite_list();
 
 		$interest_categories = $this -> get_subsite_interest_categories();
+
+		if( is_wp_error( $interest_categories ) ) {
+			return $interest_categories;
+		}
 
 		foreach( $interest_categories as $ic_id ) {
 

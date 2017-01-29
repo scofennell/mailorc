@@ -297,7 +297,11 @@ class Subsite_Control_Panel {
 	
 		$out = $this -> get_field( $args );
 
-		echo $out;
+		if( is_wp_error( $out ) ) {
+			echo '(empty)';
+		} else {
+			echo $out;
+		}
 
 	}
 
@@ -343,6 +347,7 @@ class Subsite_Control_Panel {
 			$options_obj = new $options_class( $value );
 			$options_method = $setting['options_cb'][1];
 			$options = call_user_func( array( $options_obj, $options_method ) );
+			if( is_wp_error( $options ) ) { return $options; }
 
 			$out = "
 				<select $attrs class='regular-text' id='$id' name='$name' >
@@ -421,47 +426,130 @@ class Subsite_Control_Panel {
 
 	}
 
+	function get_error_notices() {
+
+		$out = '';
+
+		$errors = array();
+
+		if( is_wp_error( $this -> meta -> has_subsite_api_key() ) ) {
+
+			$errors[] = $this -> meta -> has_subsite_api_key() -> get_error_message();
+
+		} elseif( is_wp_error( $this -> meta -> has_subsite_list() ) ) {
+
+			$errors[] = $this -> meta -> has_subsite_list() -> get_error_message();
+
+		} elseif( is_wp_error( $this -> meta -> has_subsite_interests() ) ) {
+
+			$errors[] = $this -> meta -> has_subsite_interests() -> get_error_message();
+
+		}
+
+		if( is_wp_error( $this -> meta -> has_landing_page() ) ) {
+
+			$errors[] = $this -> meta -> has_landing_page() -> get_error_message();
+
+		}
+
+		$error_count = count( $errors );
+
+		$error_messages = '';
+
+		if( ! empty( $error_count ) ) {
+
+			foreach( $errors as $error ) {
+
+				$error_messages .= "<li><span class='dashicons dashicons-no-alt'></span> $error</li>";
+
+			}
+
+			$out = "
+				<div class='notice notice-error is-dismissible'>
+					<ul>$error_messages</ul>
+				</div>
+			";
+
+		}
+
+		return $out;
+
+	}
+
 	/**
 	 * Get the admin notices for our settings page.
 	 * 
 	 * @return string The admin notices for our settings page.
 	 */
-	function get_admin_notices() {
+	function get_success_notices() {
 
-		// If the plugin is all set up, say so.
-		if( $this -> is_setup() ) {
+		$out = '';
 
-			$message  = '<p>' . esc_html__( 'Nice!  Your API Key is valid.', 'mailorc' ) . '</p>';
-			$get_interests_list = $this -> get_interests_list();
-			if( empty( $get_interests_list ) ) {
+		$successes = array();
 
-				$type = 'warning';
-				$message .= esc_html__( 'Now you just need to add some interests to your list!', 'mailorc' );
+		if( ! is_wp_error( $this -> meta -> has_subsite_api_key() ) ) {
 
-			} else {
-			
-				$type = 'success';
-				$message .= '<p>' . esc_html__( 'Here is a list of your interests by name and id:', 'mailorc' ) . '</p>';
-				$message .= $this -> get_interests_list();
-
-				$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
-				$example_url = '<code>' . get_permalink( $landing_page_id ) . '?email=hello@world.com&interest=1234abce' . '</code>';
-				$message .= '<p>' . sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url ). '</p>';
-				
-			}
-			
-			
-
-		// Else, issue a warning.
-		} else {
-
-			$message = '<p>' . esc_html__( 'Please provide a valid API Key.', 'mailorc' ) . '</p>';
-			$type = 'error';
+			$successes[] = esc_html__( 'Nice!  Your API key works.', 'mailorc' );
 
 		}
 
+		if( ! is_wp_error( $this -> meta -> has_subsite_list() ) ) {
+
+			$successes[] = esc_html__( 'Nice!  Your list ID works.', 'mailorc' );
+
+		}
+
+		if( ! is_wp_error( $this -> meta -> has_subsite_interests() ) ) {
+
+			$successes[] = esc_html__( 'Nice!  Your list has interests.', 'mailorc' );
+
+		}		
+
+		if( ! is_wp_error($this -> meta -> has_landing_page() ) ) {
+
+			$successes[] = esc_html__( 'Nice!  Your landing page exists.', 'mailorc' );
+
+		}
+
+		$successes_count = count( $successes );
+
+		$successes_messages = '';
+
+		if( ! empty( $successes_count ) ) {
+
+			foreach( $successes as $success ) {
+
+				$successes_messages .= "<li><span class='dashicons dashicons-yes'></span>$success</li>";
+
+			}
+
+			$out = "
+				<div class='notice notice-success is-dismissible'>
+					<ul>$successes_messages</ul>
+				</div>
+			";
+
+		}
+
+		return $out;
+
+	}
+
+	function get_instructions() {
+
+		// If the plugin is all set up, say so.
+		if( ! $this -> is_setup() ) { return FALSE; }
+
+		$message = '<p>' . esc_html__( 'Here is a list of your interests by name and id:', 'mailorc' ) . '</p>';
+		$message .= $this -> get_interests_list();
+
+		$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
+		$interests       = $this -> get_interests_as_comma_sep();
+		$example_url     = '<br><code>' . get_permalink( $landing_page_id ) . "?email=dog@cat.com&interests=$interests" . '</code>';
+		$message        .= '<p>' . sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url ). '</p>';
+
 		$out = "
-			<div class='notice-$type notice is-dismissible'>
+			<div class='notice-info notice is-dismissible'>
 				$message
 			</div>
 		";
@@ -477,7 +565,11 @@ class Subsite_Control_Panel {
 
 		if( ! $this -> is_current_page() ) { return FALSE; }
 
-		echo $this -> get_admin_notices();
+		echo $this -> get_success_notices();
+
+		echo $this -> get_instructions();
+
+		echo $this -> get_error_notices();
 
 	}
 
@@ -488,9 +580,17 @@ class Subsite_Control_Panel {
 	 */
 	function is_setup() {
 
-		$has_api_key = $this -> meta -> has_api_key();
+		$has_subsite_api_key = $this -> meta -> has_subsite_api_key();
+		if( is_wp_error( $has_subsite_api_key ) ) { return FALSE; }
 
-		if( is_wp_error( $has_api_key ) ) { return FALSE; }
+		$has_subsite_list_obj = $this -> meta -> has_subsite_list_obj();
+		if( is_wp_error( $has_subsite_list_obj ) ) { return FALSE; }
+
+		$has_landing_page = $this -> meta -> has_landing_page();
+		if( is_wp_error( $has_landing_page ) ) { return FALSE; }
+
+		$has_subsite_interests = $this -> meta -> has_subsite_interests();
+		if( is_wp_error( $has_subsite_interests ) ) { return FALSE; }				
 
 		return TRUE;
 
@@ -498,14 +598,22 @@ class Subsite_Control_Panel {
 
 	function get_interests_list() {
 
-		$list_id = $this -> meta -> get_subsite_list();
-
-		$list = new Single_List( $list_id );
+		$list = $this -> meta -> get_subsite_list_obj();
 
 		$out = $list -> get_interests_as_list();
 
 		return $out;
 
 	}
+
+	function get_interests_as_comma_sep() {
+
+		$list = $this -> meta -> get_subsite_list_obj();
+
+		$out = $list -> get_interests_as_comma_sep();
+
+		return $out;
+
+	}	
 
 }

@@ -37,9 +37,9 @@ class Single_List extends Resource {
 
 	}
 
-	function get_interests_as_list() {
+	function get_interests_by_category() {
 
-		$out = '';
+		$out = array();
 
 		$list_id = $this -> get_id();
 
@@ -50,14 +50,81 @@ class Single_List extends Resource {
 		foreach( $interest_category_ids as $interest_category_id ) {
 
 			$interests = new Interests( $list_id, $interest_category_id );
+			$interests = $interests -> get_response();
+			$interests = $interests['interests'];
 
-			$out .= "<li>" . $interests -> get_as_list() . "</li>";
+			foreach( $interests as $interest ) {
+
+				$out[ $interest_category_id ][ $interest['id'] ] = new Interest( $list_id, $interest_category_id, $interest['id'] );
+
+			}
+
+		}
+
+		return $out;
+
+	}
+
+	function get_interests_as_list() {
+
+		$out = '';
+
+		$interest_categories = $this -> get_interests_by_category();
+
+		foreach( $interest_categories as $interest_category_id => $interests ) {
+
+			foreach( $interests as $interest ) {
+
+				$name = $interest -> get_name();
+				$id = $interest -> get_id();
+
+				$out .= "
+					<ul>
+						<li>$name: <code>$id</code></li>
+					</ul>
+				";
+
+			}
 
 		}
 
 		if( empty( $out ) ) { return FALSE; }
 
-		return "<ul>$out</ul>";
+		return $out;
+
+	}
+
+	function get_interests_as_comma_sep() {
+		
+		$out = '';
+
+		$interest_categories = $this -> get_interests_by_category();
+
+		$list_id = $this -> get_id();
+
+		$max = 2;
+		$i = 0;
+
+		foreach( $interest_categories as $interest_category_id => $interests ) {
+
+			foreach( $interests as $interest ) {
+
+				$i++;
+				$out .= $interest -> get_id() . ',';
+
+				if( $i == $max ) { break; }
+
+			}
+
+			if( $i == $max ) { break; }
+
+		}
+
+		$out = rtrim( $out, ',' );
+
+		if( empty( $out ) ) { return FALSE; }
+
+		return $out;
 
 	}
 	

@@ -39,6 +39,8 @@ class Fields {
 		$lists = new Lists;
 		$get_lists = $lists -> get_as_kv();
 
+		if( ! is_array( $get_lists ) ) { return $get_lists; }
+
 		$get_lists = array( 0 => esc_html__( 'Please choose a list.', 'mailorc' ) ) + $get_lists;
 
 		$out = $this -> get_array_as_options( $get_lists );

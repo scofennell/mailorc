@@ -30,6 +30,7 @@ class Lists extends Resource {
 	function get_as_kv() {
 
 		$lists = $this -> get_response();
+		if( is_wp_error( $lists ) ) { return $lists; }
 		$lists = $lists['lists'];
 
 		foreach( $lists as $list ) {

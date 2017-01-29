@@ -32,6 +32,8 @@ class Interest_Categories extends Resource {
 
 		$response = $this -> get_response();
 
+		if( is_wp_error( $response ) ) { return $response; }
+
 		$cats = $response['categories'];
 
 		$out = wp_list_pluck( $cats, 'id' );
