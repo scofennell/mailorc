@@ -493,7 +493,7 @@ class Subsite_Control_Panel {
 
 		}
 
-		if( ! is_wp_error( $this -> meta -> has_subsite_list() ) ) {
+		if( ! is_wp_error( $this -> meta -> has_subsite_list_obj() ) ) {
 
 			$successes[] = esc_html__( 'Nice!  Your list ID works.', 'mailorc' );
 

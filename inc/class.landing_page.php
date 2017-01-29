@@ -83,7 +83,7 @@ class Landing_Page {
 
 		}
 
-		return "<div class='$class'>$message</div>$content";
+		return "<p class='$class'>$message</p>$content";
 
 	}
 

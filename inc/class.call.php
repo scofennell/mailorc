@@ -427,8 +427,6 @@ class Call {
 		// Was the request unsuccessful?
 		if( $this -> is_bad_response( $result ) ) {
 
-			#wp_die( var_dump( $this -> get_url() ) );
-
 			$this -> response = $this -> get_errors( $result );
 			return;			
 		}
