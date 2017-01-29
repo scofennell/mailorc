@@ -194,7 +194,7 @@ class Landing_Page {
 			
 			} else {
 
-				wp_die( var_dump( $add ) );
+				break;
 
 			}
 
