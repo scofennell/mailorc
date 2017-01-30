@@ -41,13 +41,5 @@ class Interest extends Resource {
 		$this -> endpoint = "lists/$list_id/interest-categories/$interest_category_id/interests/$interest_id";
 
 	}
-
-	function get_name() {
-
-		$interest = $this -> get_response();
-
-		return $interest['name'];
-
-	}
 	
 }

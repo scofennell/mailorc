@@ -41,6 +41,27 @@ class Interest_Categories extends Resource {
 		return $out;
 
 	}
+
+	function get_collection() {
+
+		$response = $this -> get_response();
+
+		$cats = $response['categories'];
+
+		$out = array();
+
+		foreach( $cats as $cat ) {
+
+			$ic = new Interest_Category( $this -> get_list_id(), $cat['id'] );
+
+			$out[ $cat['id'] ]['asset']      = $ic;
+			$out[ $cat['id'] ]['collection'] = $ic -> get_collection();
+
+		}
+
+		return $out;
+
+	}	
 	
 	function get_interest_category_id_by_interest_id( $interest_id ) {
 

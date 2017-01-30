@@ -545,7 +545,7 @@ class Subsite_Control_Panel {
 
 		$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
 		$interests       = $this -> get_interests_as_comma_sep();
-		$example_url     = '<br><code>' . get_permalink( $landing_page_id ) . "?email=dog@cat.com&interests=$interests" . '</code>';
+		$example_url     = '<br><code>' . get_permalink( $landing_page_id ) . "?email=*|EMAIL|*&interests=$interests" . '</code>';
 		$message        .= '<p>' . sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url ). '</p>';
 
 		$out = "

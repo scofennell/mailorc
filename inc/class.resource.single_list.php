@@ -33,35 +33,9 @@ class Single_List extends Resource {
 
 	function get_interest_categories() {
 
-		return new Interest_Categories( $this -> get_id() );
+		$ic = new Interest_Categories( $this -> get_id() );
 
-	}
-
-	function get_interests_by_category() {
-
-		$out = array();
-
-		$list_id = $this -> get_id();
-
-		$interest_categories = $this -> get_interest_categories();
-
-		$interest_category_ids = $interest_categories -> get_ids();
-
-		foreach( $interest_category_ids as $interest_category_id ) {
-
-			$interests = new Interests( $list_id, $interest_category_id );
-			$interests = $interests -> get_response();
-			$interests = $interests['interests'];
-
-			foreach( $interests as $interest ) {
-
-				$out[ $interest_category_id ][ $interest['id'] ] = new Interest( $list_id, $interest_category_id, $interest['id'] );
-
-			}
-
-		}
-
-		return $out;
+		return $ic -> get_collection();
 
 	}
 
@@ -69,22 +43,28 @@ class Single_List extends Resource {
 
 		$out = '';
 
-		$interest_categories = $this -> get_interests_by_category();
+		$interest_categories = $this -> get_interest_categories();
 
-		foreach( $interest_categories as $interest_category_id => $interests ) {
+		foreach( $interest_categories as $interest_category_id => $interest_category ) {
 
-			foreach( $interests as $interest ) {
+			$ic_asset = $interest_category['asset'];
+			$ic_collection = $interest_category['collection'];
+			$ic_title = $ic_asset -> get_title();
+
+			$out .= "<ul><h4>$ic_title</h4>";
+
+			foreach( $ic_collection as $interest_id => $interest ) {
 
 				$name = $interest -> get_name();
 				$id = $interest -> get_id();
 
 				$out .= "
-					<ul>
-						<li>$name: <code>$id</code></li>
-					</ul>
+					<li>$name: <code>$id</code></li>
 				";
 
 			}
+
+			$out .= '</ul>';
 
 		}
 
@@ -95,19 +75,22 @@ class Single_List extends Resource {
 	}
 
 	function get_interests_as_comma_sep() {
-		
+	
 		$out = '';
 
-		$interest_categories = $this -> get_interests_by_category();
+		$interest_categories = $this -> get_interest_categories();
 
 		$list_id = $this -> get_id();
 
 		$max = 2;
 		$i = 0;
 
-		foreach( $interest_categories as $interest_category_id => $interests ) {
+		foreach( $interest_categories as $interest_category_id => $interest_category ) {
 
-			foreach( $interests as $interest ) {
+			$ic_asset = $interest_category['asset'];
+			$ic_collection = $interest_category['collection'];
+
+			foreach( $ic_collection as $interest_id => $interest ) {
 
 				$i++;
 				$out .= $interest -> get_id() . ',';

@@ -31,5 +31,18 @@ class Interest_Category extends Resource {
 		$this -> endpoint = "lists/$list_id/interest-categories/$id";
 
 	}
+
+	function get_collection() {
+
+		$id = $this -> get_id();
+
+		$list_id = $this -> get_list_id();
+
+		$interests = new Interests( $list_id, $id );
+		$interests = $interests -> get_collection();
+
+		return $interests;
+
+	}
 	
 }

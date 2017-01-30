@@ -74,4 +74,25 @@ class Interests extends Resource {
 
 	}
 
+	function get_collection() {
+
+		$out = array();
+
+		$response = $this -> get_response();
+		$interests = $response['interests'];
+
+		$list_id = $this -> get_list_id();
+
+		$interest_category_id = $this -> get_interest_category_id();
+
+		foreach( $interests as $interest ) {
+
+			$out[ $interest['id'] ] = new Interest( $list_id, $interest_category_id, $interest['id'] );
+
+		}
+
+		return $out;
+
+	}
+
 }

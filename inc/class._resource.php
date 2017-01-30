@@ -80,4 +80,24 @@ abstract class Resource {
 
 	}
 
+	function get_title() {
+
+		$r = $this -> get_response();
+
+		if( ! isset( $r['title'] ) ) { return FALSE; }
+
+		return $r['title'];
+
+	}	
+
+	function get_name() {
+
+		$r = $this -> get_response();
+
+		if( ! isset( $r['name'] ) ) { return FALSE; }
+
+		return $r['name'];
+
+	}	
+
 }

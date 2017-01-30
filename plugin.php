@@ -36,7 +36,7 @@ if( defined( 'MAILORC' ) ) { exit; }
 if( isset( $mailorc ) ) { exit; }
 
 // Our master plugin object, which will own instances of various classes in our plugin.
-$mailorc = new stdClass;
+$mailorc = FALSE;
 
 // A slug for our plugin.
 define( 'MAILORC', 'mailorc' );
