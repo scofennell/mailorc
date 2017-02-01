@@ -7,7 +7,7 @@ As a Science Fiction author, you need a way for your subscribers to indicate tha
 ## Theory of Operation ##
 This plugin offers a subsite settings page so you can specify a MailChimp API key and subsequently select a list from your MailChimp account.  Also, you can select what's called a "Campaign Landing Page" from your WordPress pages.
 
-The settings page then returns a sample url for you to mimic as your write your MailChimp campaigns.  When a subscriber visits this url, they will arrive at the landing page and be added to the interests that you indicate when building the url.
+The settings page then returns a sample url for you to mimic as you write your MailChimp campaigns.  When a subscriber visits this url, they will arrive at the landing page and be added to the interests that you indicate when building the url.
 
 ## FAQ ##
 1. What about caching?
