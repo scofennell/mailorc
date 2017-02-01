@@ -30,6 +30,12 @@ class Settings {
 
 	}
 
+	/**
+	 * Get the definition of a settings section.
+	 * 
+	 * @param  string $section_id The ID of a section.
+	 * @return array              The definition of a settings section.
+	 */
 	function get_section( $section_id ) {
 
 		$settings = $this -> get_settings();

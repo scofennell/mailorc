@@ -14,39 +14,61 @@ class Landing_Page {
 
 	function __construct() {
 
+		// Grab our plugin-wide helpers.
 		global $mailorc;
 		$this -> meta = $mailorc -> meta;
 
+		// Determine which interests we're adding.
 		$this -> set_interests();
+
+		// Grab their names.
 		$this -> set_interest_names();
+
+		// Determine the email of the person we're updating.
 		$this -> set_email();
+
+		// Grab the object for the person we're updating.
 		$this -> set_member();		
 
+		// Make a call to add the member to the interests.
 		add_action( 'wp', array( $this, 'set_result' ), 100 );
 
+		// Add some UI feedback.
 		add_filter( 'the_content', array( $this, 'the_content' ) );
 
+		// Add an HTML comment for debugging.
 		add_action( 'wp_footer', array( $this, 'comment' ), 100 );
 
 	}
 
+	/**
+	 * Filter in some UI feedback on our attempt to add interests to this person.
+	 * 
+	 * @param  string $content The post content.
+	 * @return string          The post content filtered.
+	 */
 	function the_content( $content ) {
 
+		// Are we on the landing page?
 		if( is_admin() ) { return $content; }
 		if( is_feed() ) { return $content; }
 		if( ! $this -> meta -> is_landing_page() ) { return $content; }
 
-
+		// Did we get the url variables we'd need?
 		if( empty( $this -> get_email() ) && empty( $this -> get_interests() ) ) { return $content; }
 		
-
+		// Grab a css class for our feedback div.
 		$class = sanitize_html_class( __CLASS__ . '-' . __FUNCTION__ );
 
+		// Try to add the interests to the user.
 		$result = $this -> get_result();
 
-		$interest_names = $this -> get_interest_names();
+		// Grab the names of the interests.
+		$interest_names       = $this -> get_interest_names();
+		$interest_names_str   = '';
 		$interest_names_count = count( $interest_names );
-		$interest_names_str = '';
+		
+		// Loop through the names.
 		$i = 0;
 		if( is_array( $interest_names ) ) {
 			foreach( $interest_names as $interest_name ) {
@@ -69,10 +91,12 @@ class Landing_Page {
 
 		}
 
+		// If it worked...
 		if( $result ) {
 
 			$message = sprintf( esc_html__( 'Thank you for reading %s!', 'mailorc' ), $interest_names_str );
 
+		// If it didn't work...
 		} else {
 
 			if( empty( $interest_names_str ) ) {
@@ -87,6 +111,11 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Get the email for the member we're updating.
+	 * 
+	 * @return string The email for the member we're updating.
+	 */
 	function get_email() {
 
 		if( ! isset( $this -> email ) ) { return FALSE; }
@@ -95,6 +124,9 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Store the email for the member we're updating.
+	 */
 	function set_email() {
 
 
@@ -106,6 +138,11 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Get the object for the member we're updating.
+	 * 
+	 * @return object The object for the member we're updating.
+	 */
 	function get_member() {
 
 		if( ! isset( $this -> member ) ) { return FALSE; }
@@ -114,6 +151,9 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Store the object for the member we're updating.
+	 */
 	function set_member() {
 
 		$email = $this -> get_email();
@@ -128,6 +168,11 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Get the interests we're adding to the member.
+	 * 
+	 * @return array The interests we're adding to the member.
+	 */
 	function get_interests() {
 		
 		if( ! isset( $this -> interests ) ) { return FALSE; }
@@ -136,34 +181,47 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Store the interests we're adding to the member.
+	 */
 	function set_interests() {
 
+		// Were there any in the url?
 		if( ! isset( $_GET['interests'] ) ) { return FALSE; }
 
-		$url_interests_arr = explode( ',', $_GET['interests'] );
-
+		// Gran them out of the url.
+		$url_interests_arr   = explode( ',', $_GET['interests'] );
+		$url_interests_arr   = array_map( 'sanitize_text_field', $url_interests_arr );
 		$url_interests_count = count( $url_interests_arr );
 
-		$url_interests_arr = array_map( 'sanitize_text_field', $url_interests_arr );
-
-		$interests_count = 0;
-
+		// Get a list of interests for this subsite.
 		$subsite_interests = $this -> meta -> get_subsite_interests();
 
+		// Will hold a count of valid interests.
+		$interests_count = 0;
+
+		// Loop through the provided interests.
 		foreach( $url_interests_arr as $interest_id ) {
 
+			// If it's not valid, skip it.
 			if( ! in_array( $interest_id, $subsite_interests ) ) { continue; }
 
 			$interests_count ++;
 
 		}
 
+		// If they weren't all valid, bail.
 		if( $url_interests_count != $interests_count ) { return FALSE; }
 
 		$this -> interests = $url_interests_arr;
 
 	}
 
+	/**
+	 * Get the result of our API call for adding the interests.
+	 * 
+	 * @return array An http response.
+	 */
 	function get_result() {
 
 		if( ! isset( $this -> result ) ) { return FALSE; }
@@ -172,20 +230,28 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Store the result of our API call for adding the interests.
+	 */
 	function set_result() {
 
+		// If it's not okay to make a call, don't!
 		if( ! $this -> is_okay_to_run() ) { return FALSE; }
 
-		$interests = $this -> get_interests();
+		// Grab the interests.
+		$interests      = $this -> get_interests();
 		$interest_count = count( $interests );
+		
+		// Keep track of the interests that were successfully added.
 		$add_count = 0;
 
+		// Grab the member to which we're adding interests.
 		$member = $this -> get_member();
 
-		$out = array();
-
+		// For each interest...
 		foreach( $interests as $interest_id ) {
 
+			// Try to add it to the member.
 			$add = $member -> add_interest( $interest_id );
 
 			if( ! is_wp_error( $add ) ) {
@@ -212,6 +278,11 @@ class Landing_Page {
 
 	}
 	
+	/**
+	 * Is it okay to try to add interests to the member?
+	 * 
+	 * @return boolean Return TRUE if we have everything we need for adding interests, else FALSE.
+	 */
 	function is_okay_to_run() {
 
 		if( is_admin() ) { return FALSE; }
@@ -227,6 +298,9 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Echo a debugging comment into the footer.
+	 */
 	function comment() {
 
 		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
@@ -235,6 +309,11 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Get a debugging comment.
+	 * 
+	 * @return string A debugging comment for the page source footer.
+	 */
 	function get_comment() {
 
 		$messages = array(
@@ -251,6 +330,11 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Get the names of the interests we're adding.
+	 * 
+	 * @return array The names of the interests we're adding.
+	 */
 	function get_interest_names() {
 
 		if( ! isset( $this -> interest_names ) ) { return FALSE; }
@@ -259,23 +343,26 @@ class Landing_Page {
 
 	}
 
+	/**
+	 * Store the names of the interests we're adding.
+	 */
 	function set_interest_names() {
 
-		$list_id = $this -> meta -> get_subsite_list();
-
+		// Get the interests for this page.
 		$interests = $this -> get_interests();
-
 		if( ! $interests ) { return FALSE; }
 
+		// Get the interest categories for this subsite.
+		$list_id             = $this -> meta -> get_subsite_list();
 		$interest_categories = new Interest_Categories( $list_id );
 
+		// For each interest on this page...
 		foreach( $interests as $interest_id ) {
 
+			// Get the name.
 			$interest_category_id = $interest_categories -> get_interest_category_id_by_interest_id( $interest_id );
-
-			$i_obj = new Interest( $list_id, $interest_category_id, $interest_id );
-
-			$names[] = $i_obj -> get_name();
+			$i_obj                = new Interest( $list_id, $interest_category_id, $interest_id );
+			$names[]              = $i_obj -> get_name();
 
 		}
 

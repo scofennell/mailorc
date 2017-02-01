@@ -436,7 +436,9 @@ class Call {
 
 		// If it's a GET request, we can store the result as a transient.
 		if( $method == 'GET' ) {
-			set_transient( $this -> get_transient_key(), $result_json, HOUR_IN_SECONDS );
+			$time = HOUR_IN_SECONDS;
+			#$time = 1;
+			set_transient( $this -> get_transient_key(), $result_json, $time );
 		}
 		
 	}
