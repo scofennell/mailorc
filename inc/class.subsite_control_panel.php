@@ -64,10 +64,7 @@ class Subsite_Control_Panel {
 		$capability = 'update_core';
 		$menu_slug  = MAILORC;
 		$function   = array( $this, 'the_page' );
-		#$icon_url   = 'dashicons-email';
-		#$position   = 100;
-
-
+	
 		$out = add_options_page(
 			$page_title,
 			$menu_title,
@@ -272,12 +269,23 @@ class Subsite_Control_Panel {
 
 	}
 
+	/**
+	 * Echo a description for this section.
+	 * 
+	 * @param  array $section A settings section.
+	 */
 	function the_section_description( $section ) {
 
 		echo $this -> get_section_description( $section );
 
 	}
 
+	/**
+	 * Get a description for this section.
+	 * 
+	 * @param  array $section A settings section.
+	 * @return string         A description for this section.
+	 */
 	function get_section_description( $section ) {
 
 		$section_id = $section['id'];
@@ -334,18 +342,28 @@ class Subsite_Control_Panel {
 		 */
 		$name = MAILORC . '[' . $section_id . ']' . '[' . $setting_id . ']';
 
+		// Unpack any misc attrs for the input element.
 		$attrs = '';
 		if( isset( $setting['attrs'] ) ) {
 			$attrs = $this -> get_attrs_from_array( $setting['attrs'] );
 		}
 
+		// Some notes for the input.
 		$description = "<p class='description'>$description</p>";
 
+		// If it's a select...
 		if( $type == 'select' ) {
 
+			// Get the options from this CB class.
 			$options_class = __NAMESPACE__ . '\\' . $setting['options_cb'][0];
+
+			// Instantiate the CB class, providing the current value of the setting.
 			$options_obj = new $options_class( $value );
+
+			// Grab the cb method.
 			$options_method = $setting['options_cb'][1];
+
+			// Call the cb method.
 			$options = call_user_func( array( $options_obj, $options_method ) );
 			if( is_wp_error( $options ) ) { return $options; }
 
@@ -356,6 +374,7 @@ class Subsite_Control_Panel {
 				$description
 			";
 
+		// Else it's just a text input.
 		} else {
 
 			$out = "
@@ -426,26 +445,35 @@ class Subsite_Control_Panel {
 
 	}
 
+	/**
+	 * Get the error notices for this page.
+	 * 
+	 * @return string The error notices for this page.
+	 */
 	function get_error_notices() {
 
 		$out = '';
 
 		$errors = array();
 
+		// Missing an API key?
 		if( is_wp_error( $this -> meta -> has_subsite_api_key() ) ) {
 
 			$errors[] = $this -> meta -> has_subsite_api_key() -> get_error_message();
 
+		// Missing a list?
 		} elseif( is_wp_error( $this -> meta -> has_subsite_list() ) ) {
 
 			$errors[] = $this -> meta -> has_subsite_list() -> get_error_message();
 
+		// List has no interests?
 		} elseif( is_wp_error( $this -> meta -> has_subsite_interests() ) ) {
 
 			$errors[] = $this -> meta -> has_subsite_interests() -> get_error_message();
 
 		}
 
+		// No landing page?
 		if( is_wp_error( $this -> meta -> has_landing_page() ) ) {
 
 			$errors[] = $this -> meta -> has_landing_page() -> get_error_message();
@@ -487,24 +515,28 @@ class Subsite_Control_Panel {
 
 		$successes = array();
 
+		// Has an API key?
 		if( ! is_wp_error( $this -> meta -> has_subsite_api_key() ) ) {
 
 			$successes[] = esc_html__( 'Nice!  Your API key works.', 'mailorc' );
 
 		}
 
+		// Has a list ID?
 		if( ! is_wp_error( $this -> meta -> has_subsite_list_obj() ) ) {
 
 			$successes[] = esc_html__( 'Nice!  Your list ID works.', 'mailorc' );
 
 		}
 
+		// Has interests?
 		if( ! is_wp_error( $this -> meta -> has_subsite_interests() ) ) {
 
 			$successes[] = esc_html__( 'Nice!  Your list has interests.', 'mailorc' );
 
 		}		
 
+		// Has a landing page?
 		if( ! is_wp_error($this -> meta -> has_landing_page() ) ) {
 
 			$successes[] = esc_html__( 'Nice!  Your landing page exists.', 'mailorc' );
@@ -535,9 +567,13 @@ class Subsite_Control_Panel {
 
 	}
 
+	/**
+	 * Get a block of instructional text on how to use the plugin.
+	 * 
+	 * @return string A  block of instructional text on how to use the plugin.
+	 */
 	function get_instructions() {
 
-		// If the plugin is all set up, say so.
 		if( ! $this -> is_setup() ) { return FALSE; }
 
 		$message = '<p>' . esc_html__( 'Here is a list of your interests by name and id:', 'mailorc' ) . '</p>';
@@ -546,7 +582,8 @@ class Subsite_Control_Panel {
 		$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
 		$interests       = $this -> get_interests_as_comma_sep();
 		$example_url     = '<br><code>' . get_permalink( $landing_page_id ) . "?email=*|EMAIL|*&interests=$interests" . '</code>';
-		$message        .= '<p>' . sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url ). '</p>';
+		$url_text        = sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url );
+		$message        .= "<p>$url_text</p>";
 
 		$out = "
 			<div class='notice-info notice is-dismissible'>
@@ -596,6 +633,11 @@ class Subsite_Control_Panel {
 
 	}
 
+	/**
+	 * Get a list of the interests.
+	 * 
+	 * @return string a nested UL of interests.
+	 */
 	function get_interests_list() {
 
 		$list = $this -> meta -> get_subsite_list_obj();
@@ -606,6 +648,11 @@ class Subsite_Control_Panel {
 
 	}
 
+	/**
+	 * Get a comma-sep list of the interests.
+	 * 
+	 * @return string a comma-sep list of interests.
+	 */
 	function get_interests_as_comma_sep() {
 
 		$list = $this -> meta -> get_subsite_list_obj();

@@ -72,16 +72,25 @@ class Meta {
 
 	}	
 
+	/**
+	 * Determine if we are on the landing page.
+	 * 
+	 * @return boolean Returns TRUE if we are on the landing page, else FALSE.
+	 */
 	function is_landing_page() {
 
+		// No landing page?
 		if( ! $this -> has_landing_page() ) { return FALSE; }
 
+		// No page ID?
 		$current_page_id = get_the_ID();
 		if( empty( $current_page_id ) ) { return FALSE; }
 
+		// No landing page ID?
 		$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
 		if( empty( $landing_page_id ) ) { return FALSE; }
 
+		// Not the landing page?
 		if( $current_page_id != $landing_page_id ) { return FALSE; }
 
 		return TRUE;
@@ -89,7 +98,7 @@ class Meta {
 	}
 
 	/**
-	 * Determine if the plugin has been configured with a landing page.
+	 * Determine if the plugin has been configured with a list ID.
 	 * 
 	 * @return mixed Returns TRUE on success, a wp_error on failure.
 	 */
@@ -107,6 +116,11 @@ class Meta {
 
 	}	
 
+	/**
+	 * Determine if the plugin has been configured with valid list ID.
+	 * 
+	 * @return mixed Returns TRUE on success, a wp_error on failure.
+	 */
 	function has_subsite_list_obj() {
 
 		$has_subsite_list = $this -> has_subsite_list();
@@ -115,8 +129,10 @@ class Meta {
 			return $has_subsite_list;
 		}
 
+		// Make a test call to assess the validity of the list.
 		$list_obj = $this -> get_subsite_list_obj();
 		$response = $list_obj -> get_response();
+
 		if( is_wp_error( $response ) ) {
 			return new \WP_Error( 'no_subsite_list', 'Please choose a MailChimp list.' ); 
 		}
@@ -125,32 +141,55 @@ class Meta {
 
 	}
 
+	/**
+	 * Get the site-wide list ID.
+	 * 
+	 * @return string the site-wide list ID.
+	 */
 	function get_subsite_list() {
 
 		return $this -> settings -> get_subsite_value( 'mailchimp_account_setup', 'list_id' );
 
 	}
 
+	/**
+	 * The site-wide list object.
+	 * 
+	 * @return object The site-wide list object.
+	 */
 	function get_subsite_list_obj() {
 
 		return new Single_List( $this -> get_subsite_list() );
 
 	}
 
+	/**
+	 * Determine if the site-wide list has interests.
+	 * 
+	 * @return boolean Returns TRUE if the site-wide list has interests, else FALSE.
+	 */
 	function has_subsite_interests() {
 
 		$subsite_interests = $this -> get_subsite_interests();
 
 		if( is_wp_error( $subsite_interests ) ) {
-
 			return new \wp_error( 'subsite_interests', 'Your list has no interests.' );
-
 		}
 	
+		$count = count( $subsite_interests );
+		if( empty( $count ) ) {
+			return new \wp_error( 'subsite_interests', 'Your list has no interests.' );
+		}
+
 		return TRUE;
 
 	}
 
+	/**
+	 * Get the interest categories for the sitewide list.
+	 * 
+	 * @return mixed Returns an array of interest category ID's or a wp_error.
+	 */
 	function get_subsite_interest_categories() {
 
 		$ic = new Interest_Categories( $this -> get_subsite_list() );
@@ -167,6 +206,11 @@ class Meta {
 
 	}
 
+	/**
+	 * Get the interests for the sitewide list.
+	 * 
+	 * @return mixed Returns an array of interest objects or a wp_error.
+	 */
 	function get_subsite_interests() {
 
 		$out = array();
