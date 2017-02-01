@@ -1,5 +1,5 @@
 # mailorc
-A WordPress/MailChimp Integration for Sci-Fi Authors
+A WordPress/MailChimp Integration for Sci-Fi Authors.
 
 ## Purpose ##
 As a Science Fiction author, you need a way for your subscribers to indicate that they have already read a partiuclar book or books that are being advertised in a MailChimp campaign.  This WordPress plugin provides a convenient way to do that.
