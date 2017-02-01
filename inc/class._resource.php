@@ -25,18 +25,33 @@ abstract class Resource {
 
 	}
 
+	/**
+	 * Get the ID for this resource, such an interest_category ID.
+	 * 
+	 * @return string The ID for a MailChimp resource.
+	 */
 	function get_id() {
 
 		return $this -> id;
 
 	}
 
+	/**
+	 * Get the list ID for this resource.
+	 * 
+	 * @return string The ID for a MailChimp resource.
+	 */
 	function get_list_id() {
 
 		return $this -> list_id;
 
 	}
 
+	/**
+	 * Get the ID of the list that has been selected in the subsite settings page.
+	 * 
+	 * @return string The ID of the list that has been selected in the subsite settings page.
+	 */
 	function get_subsite_list() {
 
 		return $this -> settings -> get_subsite_value( 'mailchimp_account_setup', 'list_id' );
@@ -70,16 +85,34 @@ abstract class Resource {
 	 */
 	function get_response() {
 
+		if( ! isset( $this -> response ) ) {
+			$this -> set_response();
+		}
+
+		return $this -> response;
+
+	}
+
+	/**
+	 * Grab our call class and store an API response.
+	 */
+	function set_response() {
+
 		$args = array(
 			'endpoint' => $this -> get_endpoint(),
 		);
 
 		$call = new Call( $args );
 
-		return $call -> get_response();
+		$this -> response = $call -> get_response();
 
 	}
 
+	/**
+	 * Get the title of this resource.
+	 * 
+	 * @return string The title of this resource.
+	 */
 	function get_title() {
 
 		$r = $this -> get_response();
@@ -90,6 +123,11 @@ abstract class Resource {
 
 	}	
 
+	/**
+	 * Get the name of this resource.
+	 * 
+	 * @return string The name of this resource.
+	 */
 	function get_name() {
 
 		$r = $this -> get_response();

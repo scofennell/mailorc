@@ -246,14 +246,11 @@ class Call {
 			$params = $this -> args['params'];
 		}
 
-		// If we passed in 'max' for our count, parse that into the actual integer maximum.
-		$max = $this -> get_max();
-		if( isset( $params['count'] ) ) {
-			if( $params['count'] == 'max' ) {
-				$params['count'] = $max;
-			}
+		// Might as well always get the maximum number of results.
+		if( $this -> get_method() == 'GET' ) {
+			$params['count'] = 100;
 		}
-		
+			
 		// Not sure why this sneaks in or why it would be a problem, but it's not needed and we've always stripped it out.
 		unset( $params['id'] );
 

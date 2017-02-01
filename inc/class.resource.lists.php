@@ -1,7 +1,7 @@
 <?php
 
 /**
- * A class for interacting with the list/$list_id endpoint of the MailChimp api.
+ * A class for interacting with the lists endpoint of the MailChimp api.
  *
  * @package WordPress
  * @subpackage MailOrc
@@ -27,6 +27,11 @@ class Lists extends Resource {
 
 	}
 
+	/**
+	 * Get the lists as an ID -> name array.
+	 * 
+	 * @return array The lists as an ID -> name array.
+	 */
 	function get_as_kv() {
 
 		$lists = $this -> get_response();

@@ -12,6 +12,13 @@ namespace MailOrc;
 
 class Member extends Resource {
 
+	/**
+	 * Set up our class members.
+	 * 
+	 * @param string $list_id The list ID for this member.
+	 * @param string $email   The email address for this member.
+	 * @param array  $args    Other args.
+	 */
 	function __construct( string $list_id, string $email, $args = array() ) {
 
 		$this -> list_id = $list_id;
@@ -19,22 +26,20 @@ class Member extends Resource {
 		$this -> email = $email;
 		$this -> set_hash();
 
-
 		parent::__construct();
 
 	}
 
+	/**
+	 * Get the email address for this member.
+	 * 
+	 * @return string The email address for this member.
+	 */
 	function get_email() {
 
 		return $this -> email;
 
 	}
-
-	function get_list_id() {
-
-		return $this -> list_id;
-
-	}	
 
 	function set_endpoint() {
 
@@ -46,18 +51,31 @@ class Member extends Resource {
 
 	}
 
+	/**
+	 * Store the email as a hash per MC conventions.
+	 */
 	function set_hash() {
 
 		$this -> hash = md5( strtolower( $this -> get_email() ) );
 
 	}
 
+	/**
+	 * Get the hashed email.
+	 * 
+	 * @return string The hashed email.
+	 */
 	function get_hash() {
 
 		return $this -> hash;
 
 	}
 
+	/**
+	 * Add an interest to this member.
+	 * 
+	 * @return array The result of an API call.
+	 */
 	function add_interest( $interest_id ) {
 
 		$args = array(

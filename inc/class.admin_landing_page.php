@@ -21,6 +21,9 @@ class Admin_Landing_Page {
 
 	}
 	
+	/**
+	 * Echo a reminder to the admin that the current page is his landing page.
+	 */
 	function admin_notices() {
 
 		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
@@ -28,6 +31,11 @@ class Admin_Landing_Page {
 		echo $this -> get_admin_notices();
 	}
 
+	/**
+	 * Return a reminder to the admin that the current page is his landing page.
+	 * 
+	 * @return string A reminder to the admin that the current page is his landing page.
+	 */
 	function get_admin_notices() {
 
 		$message = sprintf( esc_html__( 'This is your %s campaign landing page!', 'mailorc' ), $this -> meta -> get_label() );
