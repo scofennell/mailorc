@@ -129,6 +129,7 @@ class Landing_Page {
 	 */
 	function set_email() {
 
+		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
 		if( ! isset( $_GET['email'] ) ) { return FALSE; }
 
@@ -355,6 +356,8 @@ class Landing_Page {
 	 * Store the names of the interests we're adding.
 	 */
 	function set_interest_names() {
+
+		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
 		// Get the interests for this page.
 		$interests = $this -> get_interests();
