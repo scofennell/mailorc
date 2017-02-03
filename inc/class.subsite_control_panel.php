@@ -14,6 +14,8 @@ class Subsite_Control_Panel {
 
 	function __construct() {
 
+		#delete_option( MAILORC );
+
 		// Grab our plugin-wide helpers.
 		global $mailorc;
 		$this -> meta     = $mailorc -> meta;

@@ -19,16 +19,16 @@ class Landing_Page {
 		$this -> meta = $mailorc -> meta;
 
 		// Determine which interests we're adding.
-		$this -> set_interests();
+		add_action( 'wp', array( $this, 'set_interests' ), 50 );
 
 		// Grab their names.
-		$this -> set_interest_names();
+		add_action( 'wp', array( $this, 'set_interest_names' ), 51 );
 
 		// Determine the email of the person we're updating.
-		$this -> set_email();
+		add_action( 'wp', array( $this, 'set_email' ), 52 );
 
 		// Grab the object for the person we're updating.
-		$this -> set_member();		
+		add_action( 'wp', array( $this, 'set_member' ), 53 );
 
 		// Make a call to add the member to the interests.
 		add_action( 'wp', array( $this, 'set_result' ), 100 );
@@ -156,9 +156,15 @@ class Landing_Page {
 	 */
 	function set_member() {
 
+		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
+
 		$email = $this -> get_email();
 
+		if( empty( $email ) ) { return FALSE; }
+
 		$list_id = $this -> meta -> get_subsite_list();
+
+		if( empty( $list_id ) ) { return FALSE; }
 
 		$member = new Member( $list_id, $email );
 
@@ -185,6 +191,8 @@ class Landing_Page {
 	 * Store the interests we're adding to the member.
 	 */
 	function set_interests() {
+
+		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
 		// Were there any in the url?
 		if( ! isset( $_GET['interests'] ) ) { return FALSE; }
