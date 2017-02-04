@@ -133,7 +133,9 @@ class Landing_Page {
 
 		if( ! isset( $_GET['email'] ) ) { return FALSE; }
 
-		$email = sanitize_email( $_GET['email'] );
+		// PHP thinks an email address with a plus in it as actually a space.
+		$email = str_replace( ' ', '+', $_GET['email'] );
+		$email = sanitize_email( $email );
 
 		$this -> email = $email;
 
