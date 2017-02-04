@@ -12,9 +12,9 @@ namespace MailOrc;
 
 class Single_List extends Resource {
 
-	function __construct( string $id ) {
+	function __construct( $id ) {
 
-		$this -> id = $id;
+		$this -> id = sanitize_text_field( $id );
 
 		parent::__construct();
 

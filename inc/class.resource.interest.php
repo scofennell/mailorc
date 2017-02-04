@@ -20,7 +20,7 @@ class Interest extends Resource {
 	 * @param string $id                   The ID for the interest.
 	 * @param array  $args                 Other args.
 	 */
-	function __construct( string $list_id, string $interest_category_id, string $id, $args = array() ) {
+	function __construct( $list_id, $interest_category_id, $id, $args = array() ) {
 
 		$this -> id = $id;
 

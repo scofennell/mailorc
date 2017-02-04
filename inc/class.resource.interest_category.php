@@ -19,7 +19,7 @@ class Interest_Category extends Resource {
 	 * @param string $id      The id for this interest category.
 	 * @param array  $args    Other args.
 	 */
-	function __construct( string $list_id, string $id, $args = array() ) {
+	function __construct( $list_id, $id, $args = array() ) {
 
 		$this -> id = $id;
 

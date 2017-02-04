@@ -18,7 +18,7 @@ class Interest_Categories extends Resource {
 	 * @param string $list_id The ID of the list for these categories.
 	 * @param array  $args    Other args.
 	 */
-	function __construct( string $list_id, $args = array() ) {
+	function __construct( $list_id, $args = array() ) {
 
 		$this -> list_id = $list_id;		
 

@@ -19,7 +19,7 @@ class Member extends Resource {
 	 * @param string $email   The email address for this member.
 	 * @param array  $args    Other args.
 	 */
-	function __construct( string $list_id, string $email, $args = array() ) {
+	function __construct( $list_id, $email, $args = array() ) {
 
 		$this -> list_id = $list_id;
 

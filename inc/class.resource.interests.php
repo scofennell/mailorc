@@ -12,7 +12,7 @@ namespace MailOrc;
 
 class Interests extends Resource {
 
-	function __construct( string $list_id, string $interest_category_id, $args = array() ) {
+	function __construct( $list_id, $interest_category_id, $args = array() ) {
 
 		$this -> interest_category_id = $interest_category_id;
 
