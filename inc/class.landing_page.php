@@ -34,80 +34,58 @@ class Landing_Page {
 		add_action( 'wp', array( $this, 'set_result' ), 100 );
 
 		// Add some UI feedback.
-		add_filter( 'the_content', array( $this, 'the_content' ) );
-
-		// Add an HTML comment for debugging.
-		add_action( 'wp_footer', array( $this, 'comment' ), 100 );
+		add_filter( 'wp_footer', array( $this, 'the_feedback' ) );
 
 	}
 
 	/**
-	 * Filter in some UI feedback on our attempt to add interests to this person.
+	 * Add some console feedback on our attempt to add interests to this person.
 	 * 
 	 * @param  string $content The post content.
 	 * @return string          The post content filtered.
 	 */
-	function the_content( $content ) {
+	function the_feedback() {
 
 		// Are we on the landing page?
-		if( is_admin() ) { return $content; }
-		if( is_feed() ) { return $content; }
-		if( ! $this -> meta -> is_landing_page() ) { return $content; }
+		if( is_admin() ) { return FALSE; }
+		if( is_feed() ) { return FALSE; }
+		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
-		// Did we get the url variables we'd need?
-		if( empty( $this -> get_email() ) && empty( $this -> get_interests() ) ) { return $content; }
+		// Did we get the data we needed?
+		if( empty( $this -> get_email() ) && empty( $this -> get_interests() ) ) { return FALSE; }
 		
-		// Grab a css class for our feedback div.
-		$class = sanitize_html_class( __CLASS__ . '-' . __FUNCTION__ );
+		echo $this -> get_feedback();
 
-		// Try to add the interests to the user.
+	}
+
+	function get_feedback() {
+	
 		$result = $this -> get_result();
-
-		// Grab the names of the interests.
-		$interest_names       = $this -> get_interest_names();
-		$interest_names_str   = '';
-		$interest_names_count = count( $interest_names );
-		
-		// Loop through the names.
-		$i = 0;
-		if( is_array( $interest_names ) ) {
-			foreach( $interest_names as $interest_name ) {
-
-				$interest_names_str .= "<strong>$interest_name</strong>";
-
-				$i++;
-
-				if( $i == ( $interest_names_count - 1 ) ) {
-
-					$interest_names_str .= ' ' . esc_html__( 'and', 'mailorc' ) . ' ';
-
-				} elseif( $i < $interest_names_count ) {
-
-					$interest_names_str .= ' ' . esc_html__( ',', 'mailorc' ) . ' ';
-
-				}
-
-			}
-
-		}
-
-		// If it worked...
-		if( $result ) {
-
-			$message = sprintf( esc_html__( 'Thank you for reading %s!', 'mailorc' ), $interest_names_str );
-
-		// If it didn't work...
+		if( is_wp_error( $result ) ) {
+			$result = $result -> get_error_message();
 		} else {
-
-			if( empty( $interest_names_str ) ) {
-				$interest_names_str = '<strong>(empty)</strong>';
-			}
-
-			$message = sprintf( esc_html__( 'There has been an error attempting to thank you for reading %s.', 'mailorc' ), $interest_names_str );
-
+			$result = 'SUCCESS';
 		}
 
-		return "<p class='$class'>$message</p>$content";
+		$out = array(
+			'is_campaign_landing_page' => TRUE,
+			'result'                   => $result,
+			'email'                    => $this -> get_email(),
+			'interests'                => $this -> get_interests(),
+			'interest_names'           => $this -> get_interest_names(),
+		);
+
+		$out = json_encode( $out );
+
+		$out = "
+			<!-- MAILORC FEEDBACK -->
+			<script>
+				console.log( $out );
+			</script>
+		";
+
+		return $out;
+
 
 	}
 
@@ -271,6 +249,7 @@ class Landing_Page {
 			
 			} else {
 
+				$out = $add;
 				break;
 
 			}
@@ -285,7 +264,7 @@ class Landing_Page {
 
 		}
 
-		$this -> result = FALSE;
+		$this -> result = $out;
 
 	}
 	
@@ -306,38 +285,6 @@ class Landing_Page {
 		if( empty( $this -> get_member() ) ) { return FALSE; }
 
 		return TRUE;
-
-	}
-
-	/**
-	 * Echo a debugging comment into the footer.
-	 */
-	function comment() {
-
-		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
-
-		echo $this -> get_comment();
-
-	}
-
-	/**
-	 * Get a debugging comment.
-	 * 
-	 * @return string A debugging comment for the page source footer.
-	 */
-	function get_comment() {
-
-		$messages = array(
-			sprintf( esc_html__( 'This is your %s campaign landing page!', 'mailorc' ), $this -> meta -> get_label() ),
-			sprintf( esc_html__( 'Email: %s', 'mailorc' ), $this -> get_email() ),
-			sprintf( esc_html__( 'Interests: %s', 'mailorc' ), json_encode( $this -> get_interests() ) ),	
-		);
-
-		$message = implode( ' | ', $messages );
-
-		$out = "<!-- $message -->";
-
-		return $out;
 
 	}
 
