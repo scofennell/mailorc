@@ -11,7 +11,7 @@
  * Plugin URI: http://www.scottfennell.com
  * Description: A WordPress/MailChimp Integration for Sci-Fi Authors.
  * Author: Scott Fennell
- * Version: 0.5
+ * Version: 0.6
  * Author URI: http://www.scottfennell.com
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ $mailorc = FALSE;
 define( 'MAILORC', 'mailorc' );
 
 // Establish a value for plugin version to bust file caches.
-define( 'MAILORC_VERSION', '0.5' );
+define( 'MAILORC_VERSION', '0.6' );
 
 // A constant to define the paths to our plugin folders.
 define( 'MAILORC_FILE', __FILE__ );

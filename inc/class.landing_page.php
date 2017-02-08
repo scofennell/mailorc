@@ -24,8 +24,8 @@ class Landing_Page {
 		// Grab their names.
 		add_action( 'wp', array( $this, 'set_interest_names' ), 51 );
 
-		// Determine the email of the person we're updating.
-		add_action( 'wp', array( $this, 'set_email' ), 52 );
+		// Determine the unique_email_id of the person we're updating.
+		add_action( 'wp', array( $this, 'set_unique_email_id' ), 52 );
 
 		// Grab the object for the person we're updating.
 		add_action( 'wp', array( $this, 'set_member' ), 53 );
@@ -52,16 +52,23 @@ class Landing_Page {
 		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
 		// Did we get the data we needed?
-		if( empty( $this -> get_email() ) && empty( $this -> get_interests() ) ) { return FALSE; }
+		if( empty( $this -> get_unique_email_id() ) && empty( $this -> get_interests() ) ) { return FALSE; }
 		
 		echo $this -> get_feedback();
 
 	}
 
+	/**
+	 * Build a JS debug message for the console.
+	 * 
+	 * @return string Some JS for debugging.
+	 */
 	function get_feedback() {
 	
 		$result = $this -> get_result();
-		if( is_wp_error( $result ) ) {
+		if( ! $result ) {
+
+		} elseif( is_wp_error( $result ) ) {
 			$result = $result -> get_error_message();
 		} else {
 			$result = 'SUCCESS';
@@ -70,7 +77,7 @@ class Landing_Page {
 		$out = array(
 			'is_campaign_landing_page' => TRUE,
 			'result'                   => $result,
-			'email'                    => $this -> get_email(),
+			'unique_email_id'          => $this -> get_unique_email_id(),
 			'interests'                => $this -> get_interests(),
 			'interest_names'           => $this -> get_interest_names(),
 		);
@@ -90,32 +97,32 @@ class Landing_Page {
 	}
 
 	/**
-	 * Get the email for the member we're updating.
+	 * Get the unique_email_id for the member we're updating.
 	 * 
-	 * @return string The email for the member we're updating.
+	 * @return string The unique_email_id for the member we're updating.
 	 */
-	function get_email() {
+	function get_unique_email_id() {
 
-		if( ! isset( $this -> email ) ) { return FALSE; }
+		if( ! isset( $this -> unique_email_id ) ) { return FALSE; }
 
-		return $this -> email;
+		return $this -> unique_email_id;
 
 	}
 
 	/**
-	 * Store the email for the member we're updating.
+	 * Store the unique_email_id for the member we're updating.
 	 */
-	function set_email() {
+	function set_unique_email_id() {
 
 		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
-		if( ! isset( $_GET['email'] ) ) { return FALSE; }
+		if( ! isset( $_GET['unique_email_id'] ) ) { return FALSE; }
 
-		// PHP thinks an email address with a plus in it as actually a space.
-		$email = str_replace( ' ', '+', $_GET['email'] );
-		$email = sanitize_email( $email );
+		// PHP thinks an unique_email_id address with a plus in it as actually a space.
+		$unique_email_id = str_replace( ' ', '+', $_GET['unique_email_id'] );
+		$unique_email_id = sanitize_text_field( $unique_email_id );
 
-		$this -> email = $email;
+		$this -> unique_email_id = $unique_email_id;
 
 	}
 
@@ -126,7 +133,7 @@ class Landing_Page {
 	 */
 	function get_member() {
 
-		if( ! isset( $this -> member ) ) { return FALSE; }
+		if( ! isset( $this -> member ) ) { return new \WP_Error( 'no_member', 'Could not find a member with the UNIQID provided.' ); }
 
 		return $this -> member;
 
@@ -139,15 +146,15 @@ class Landing_Page {
 
 		if( ! $this -> meta -> is_landing_page() ) { return FALSE; }
 
-		$email = $this -> get_email();
+		$unique_email_id = $this -> get_unique_email_id();
 
-		if( empty( $email ) ) { return FALSE; }
+		if( empty( $unique_email_id ) ) { return FALSE; }
 
 		$list_id = $this -> meta -> get_subsite_list();
 
 		if( empty( $list_id ) ) { return FALSE; }
 
-		$member = new Member( $list_id, $email );
+		$member = new Member( $list_id, $unique_email_id );
 
 		if( is_wp_error( $member ) ) { return FALSE; }
 
@@ -236,6 +243,10 @@ class Landing_Page {
 
 		// Grab the member to which we're adding interests.
 		$member = $this -> get_member();
+
+		if( is_wp_error( $member ) ) {
+			return $member;
+		}
 
 		// For each interest...
 		foreach( $interests as $interest_id ) {
