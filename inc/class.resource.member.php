@@ -21,8 +21,7 @@ class Member extends Resource {
 	 */
 	function __construct( $list_id, $identifier, $args = array() ) {
 
-		$this -> list_id = $list_id;
-
+		$this -> list_id    = $list_id;
 		$this -> identifier = $identifier;
 
 		$this -> set_unique_email_id();
@@ -110,10 +109,12 @@ class Member extends Resource {
 
 	}	
 
+	/**
+	 * Store the endpoint to which this class makes API requests.
+	 */
 	function set_endpoint() {
 
-		$hash = $this -> get_hash();
-
+		$hash    = $this -> get_hash();
 		$list_id = $this -> get_list_id();
 
 		$this -> endpoint = "lists/$list_id/members/$hash";

@@ -96,7 +96,7 @@ class Subsite_Control_Panel {
 	function get_page() {
 
 		$title = '<h1>' . $this -> meta -> get_label() . '</h1>';
-		$form = $this -> get_form();
+		$form  = $this -> get_form();
 
 		$out = "
 			<div class='wrap'>
@@ -291,8 +291,7 @@ class Subsite_Control_Panel {
 	function get_section_description( $section ) {
 
 		$section_id = $section['id'];
-
-		$section = $this -> settings -> get_section( $section_id );
+		$section    = $this -> settings -> get_section( $section_id );
 
 		return $section['description']; 
 

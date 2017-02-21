@@ -31,6 +31,11 @@ class Single_List extends Resource {
 
 	}
 
+	/**
+	 * Call MailChimp and get a list of all of the interest categories for this list.
+	 * 
+	 * @return array An array of interest categories.
+	 */
 	function get_interest_categories() {
 
 		$ic = new Interest_Categories( $this -> get_id() );
@@ -39,6 +44,11 @@ class Single_List extends Resource {
 
 	}
 
+	/**
+	 * Call MailChimp and get a list of all of the interests for this list.
+	 * 
+	 * @return string An html list of interests.
+	 */
 	function get_interests_as_list() {
 
 		$out = '';
@@ -74,6 +84,11 @@ class Single_List extends Resource {
 
 	}
 
+	/**
+	 * Call MailChimp and get a list of some of the interests for this list.
+	 * 
+	 * @return string An comma-sep list of interests.
+	 */
 	function get_interests_as_comma_sep() {
 	
 		$out = '';
@@ -82,9 +97,10 @@ class Single_List extends Resource {
 
 		$list_id = $this -> get_id();
 
+		// The max number of results to include.
 		$max = 2;
-		$i = 0;
 
+		$i = 0;
 		foreach( $interest_categories as $interest_category_id => $interest_category ) {
 
 			$ic_asset = $interest_category['asset'];

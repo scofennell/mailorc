@@ -21,8 +21,7 @@ class Interest_Category extends Resource {
 	 */
 	function __construct( $list_id, $id, $args = array() ) {
 
-		$this -> id = $id;
-
+		$this -> id      = $id;
 		$this -> list_id = $list_id;
 
 		parent::__construct();
