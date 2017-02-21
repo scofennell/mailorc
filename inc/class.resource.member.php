@@ -125,6 +125,8 @@ class Member extends Resource {
 	 */
 	function set_hash() {
 
+		if( is_wp_error( $this -> get_email() ) ) { return FALSE; }
+
 		$this -> hash = md5( strtolower( $this -> get_email() ) );
 
 	}
@@ -135,6 +137,8 @@ class Member extends Resource {
 	 * @return string The hashed email.
 	 */
 	function get_hash() {
+
+		if( ! isset( $this -> hash ) ) { return FALSE; }
 
 		return $this -> hash;
 

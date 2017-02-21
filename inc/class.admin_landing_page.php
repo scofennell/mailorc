@@ -38,7 +38,7 @@ class Admin_Landing_Page {
 	 */
 	function get_admin_notices() {
 
-		$message = sprintf( esc_html__( 'This is your %s campaign landing page!', 'mailorc' ), $this -> meta -> get_label() );
+		$message = sprintf( esc_html__( 'This is a %s campaign landing page!', 'mailorc' ), $this -> meta -> get_label() );
 
 		$out = "
 			<div class='notice notice-warning is-dismissible'>

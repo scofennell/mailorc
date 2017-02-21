@@ -328,7 +328,12 @@ class Subsite_Control_Panel {
 		$setting    = $args['setting'];
 		
 		// Get our plugin option.  We'll need it to prepopulate the form fields.
-		$value = esc_attr( $this -> settings -> get_subsite_value( $section_id, $setting_id ) );
+		$value = $this -> settings -> get_subsite_value( $section_id, $setting_id );
+		if( is_scalar( $value ) ) {
+			$value = esc_attr( $value );
+		} else {
+			$value = array_map( 'esc_attr', $value );	
+		}
 
 		// It's probably a text input!
 		$type = $setting['type'];
@@ -360,7 +365,7 @@ class Subsite_Control_Panel {
 			$options_class = __NAMESPACE__ . '\\' . $setting['options_cb'][0];
 
 			// Instantiate the CB class, providing the current value of the setting.
-			$options_obj = new $options_class( $value );
+			$options_obj = new $options_class( $value, $id, $name );
 
 			// Grab the cb method.
 			$options_method = $setting['options_cb'][1];
@@ -373,6 +378,26 @@ class Subsite_Control_Panel {
 				<select $attrs class='regular-text' id='$id' name='$name' >
 					$options
 				</select>
+				$description
+			";
+
+		} elseif( $type == 'checkbox_group' ) {
+
+			// Get the options from this CB class.
+			$options_class = __NAMESPACE__ . '\\' . $setting['options_cb'][0];
+
+			// Instantiate the CB class, providing the current value of the setting.
+			$options_obj = new $options_class( $value, $id, $name );
+
+			// Grab the cb method.
+			$options_method = $setting['options_cb'][1];
+
+			// Call the cb method.
+			$options = call_user_func( array( $options_obj, $options_method ) );
+			if( is_wp_error( $options ) ) { return $options; }
+
+			$out = "
+				$options
 				$description
 			";
 
@@ -433,8 +458,15 @@ class Subsite_Control_Panel {
 			// For each setting...
 			foreach( $settings as $k => $v ) {
 
-				// The only tags should be script tags.  Weird, right?
-				$v = sanitize_text_field( $v );
+				if( is_scalar( $v ) ) {
+
+					$v = sanitize_text_field( $v );
+
+				} else {
+
+					$v = array_map( 'sanitize_text_field', $v );
+
+				}
 
 				// Nice!  Pass the cleaned value into the array.
 				$clean[ $section ][ $k ] = $v;
@@ -476,9 +508,9 @@ class Subsite_Control_Panel {
 		}
 
 		// No landing page?
-		if( is_wp_error( $this -> meta -> has_landing_page() ) ) {
+		if( is_wp_error( $this -> meta -> has_landing_pages() ) ) {
 
-			$errors[] = $this -> meta -> has_landing_page() -> get_error_message();
+			$errors[] = $this -> meta -> has_landing_pages() -> get_error_message();
 
 		}
 
@@ -539,9 +571,9 @@ class Subsite_Control_Panel {
 		}		
 
 		// Has a landing page?
-		if( ! is_wp_error($this -> meta -> has_landing_page() ) ) {
+		if( ! is_wp_error($this -> meta -> has_landing_pages() ) ) {
 
-			$successes[] = esc_html__( 'Nice!  Your landing page exists.', 'mailorc' );
+			$successes[] = esc_html__( 'Nice!  Your landing pages exist.', 'mailorc' );
 
 		}
 
@@ -581,11 +613,12 @@ class Subsite_Control_Panel {
 		$message = '<p>' . esc_html__( 'Here is a list of your interests by name and id:', 'mailorc' ) . '</p>';
 		$message .= $this -> get_interests_list();
 
-		$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
-		$interests       = $this -> get_interests_as_comma_sep();
-		$example_url     = '<br><code>' . get_permalink( $landing_page_id ) . "?unique_email_id=*|UNIQID|*&interests=$interests" . '</code>';
-		$url_text        = sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url );
-		$message        .= "<p>$url_text</p>";
+		$landing_page_ids = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_pages' );
+		$landing_page_id  = $landing_page_ids[0];
+		$interests        = $this -> get_interests_as_comma_sep();
+		$example_url      = '<br><code>' . get_permalink( $landing_page_id ) . "?unique_email_id=*|UNIQID|*&interests=$interests" . '</code>';
+		$url_text         = sprintf( esc_html__( 'Here is an example of a url you would use in your campaign: %s.', 'mailorc' ), $example_url );
+		$message         .= "<p>$url_text</p>";
 
 		$out = "
 			<div class='notice-info notice is-dismissible'>
@@ -625,8 +658,8 @@ class Subsite_Control_Panel {
 		$has_subsite_list_obj = $this -> meta -> has_subsite_list_obj();
 		if( is_wp_error( $has_subsite_list_obj ) ) { return FALSE; }
 
-		$has_landing_page = $this -> meta -> has_landing_page();
-		if( is_wp_error( $has_landing_page ) ) { return FALSE; }
+		$has_landing_pages = $this -> meta -> has_landing_pages();
+		if( is_wp_error( $has_landing_pages ) ) { return FALSE; }
 
 		$has_subsite_interests = $this -> meta -> has_subsite_interests();
 		if( is_wp_error( $has_subsite_interests ) ) { return FALSE; }				

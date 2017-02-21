@@ -50,27 +50,40 @@ class Meta {
 	}
 
 	/**
-	 * Determine if the plugin has been configured with a landing page.
+	 * Determine if the plugin has been configured with landing pages.
 	 * 
 	 * @return mixed Returns TRUE on success, a wp_error on failure.
 	 */
-	function has_landing_page() {
+	function has_landing_pages() {
 
-		$get_landing_page = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
+		$get_landing_pages = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_pages' );
 
-		if( empty( $get_landing_page ) ) {
-			return new \WP_Error( 'no_landing_page', 'Please choose a landing page.' );
+		$error = new \WP_Error( 'no_landing_pages', 'Please choose at least one landing page.' );
+
+		if( ! is_array( $get_landing_pages ) ) {
+			return $error;
 		}
 
-		$get_page = get_page( $get_landing_page );
+		$count = count( $get_landing_pages );
+		if( empty( $count ) ) {
+			return $error;
+		}
 
-		if( ! ( is_a( $get_page, 'WP_Post' ) ) ) {
-			return new \WP_Error( 'no_landing_page', 'Please choose a landing page.' );
-		}		
+		foreach( $get_landing_pages as $id ) {
+			
+			$get_page = get_page( $id );
 
-		return TRUE;
+			if( is_a( $get_page, 'WP_Post' ) ) {
+				
+				return TRUE;
 
-	}	
+			}		
+
+		}
+
+		return $error;
+	
+	}
 
 	/**
 	 * Determine if we are on the landing page.
@@ -80,18 +93,15 @@ class Meta {
 	function is_landing_page() {
 
 		// No landing page?
-		if( ! $this -> has_landing_page() ) { return FALSE; }
+		if( is_wp_error( $this -> has_landing_pages() ) ) { return FALSE; }
 
 		// No page ID?
 		$current_page_id = get_the_ID();
 		if( empty( $current_page_id ) ) { return FALSE; }
 
-		// No landing page ID?
-		$landing_page_id = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_page' );
-		if( empty( $landing_page_id ) ) { return FALSE; }
-
 		// Not the landing page?
-		if( $current_page_id != $landing_page_id ) { return FALSE; }
+		$landing_pages = $this -> settings -> get_subsite_value( 'wordpress_setup', 'landing_pages' );
+		if( ! in_array( $current_page_id, $landing_pages ) ) { return FALSE; }
 
 		return TRUE;
 

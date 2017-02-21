@@ -16,11 +16,17 @@ class Fields {
 	 * Set up our class variables.
 	 * 
 	 * @param boolean $current_value The current value of the setting for which we're building a field.
+	 * @param boolean $current_value The ID for the field.
+	 * @param boolean $current_value The name for the field.
 	 */
-	function __construct( $current_value = FALSE ) {
+	function __construct( $current_value = FALSE, $id = '', $name = '' ) {
 
 		$this -> current_value = $current_value;
-		
+
+		$this -> id = $id;
+
+		$this -> name = $name;
+
 	}
 
 	/**
@@ -37,6 +43,24 @@ class Fields {
 		$pages = array( 0 => esc_html__( 'Please choose a page.', 'mailorc' ) ) + $pages;
 
 		$out = $this -> get_array_as_options( $pages );
+
+		return $out;
+
+	}
+
+
+	/**
+	 * Get our WP pages a checkboxes.
+	 * 
+	 * @return string Our WP pages as select options.
+	 */
+	function get_pages_as_checkboxes() {
+
+		$pages = get_pages();
+		$pages = wp_list_pluck( $pages, 'post_title', 'ID' );
+
+		// Add a blank item to the beginning.
+		$out = $this -> get_array_as_checkboxes( $pages );
 
 		return $out;
 
@@ -77,6 +101,43 @@ class Fields {
 			$selected = selected( $this -> current_value, $k, FALSE );
 
 			$out .= "<option value='$k' $selected>$v</option>";
+
+		}
+
+		return $out;
+
+	}
+
+	/**
+	 * Convert as associative array to select options.
+	 * 
+	 * @param  array  $array An associative array.
+	 * @return string        Select options.
+	 */
+	function get_array_as_checkboxes( array $array ) {
+
+		$out = '';
+
+		$id   = $this -> id;
+		$name = $this -> name . '[]';
+
+		foreach( $array as $k => $v ) {
+
+			$checked = '';
+			if( is_array( $this -> current_value ) ) {
+				if( in_array( $k, $this -> current_value ) ) {
+					$checked = 'checked';
+				}
+			} else {
+				$checked = checked( $k, $this -> current_value, FALSE );
+			}
+
+			$out .= "
+				<div>
+					<input type='checkbox' value='$k' id='$id-$k' name='$name' $checked>
+					<label for='$id-$k'>$v</label>
+				</div>
+			";
 
 		}
 

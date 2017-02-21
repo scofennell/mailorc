@@ -115,11 +115,11 @@ class Settings {
 				'settings' => array(
 
 					// A setting.
-					'landing_page' => array(
-						'type'        => 'select',
-						'label'       => esc_html__( 'Campaign Landing Page', 'mailorc' ),
-						'description' => "<a href='" . get_admin_url( FALSE, 'edit.php?post_type=page' ) . "'>" . esc_html__( 'You may have to create your landing page if you have not yet done so.', 'mailorc' ) . '</a>',
-						'options_cb'  => array( 'Fields', 'get_pages_as_options' ),
+					'landing_pages' => array(
+						'type'        => 'checkbox_group',
+						'label'       => esc_html__( 'Campaign Landing Pages', 'mailorc' ),
+						'description' => "<a href='" . get_admin_url( FALSE, 'edit.php?post_type=page' ) . "'>" . esc_html__( 'You may have to create your landing pages if you have not yet done so.', 'mailorc' ) . '</a>',
+						'options_cb'  => array( 'Fields', 'get_pages_as_checkboxes' ),
 					),
 
 				),
