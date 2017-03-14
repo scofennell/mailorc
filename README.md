@@ -1,8 +1,8 @@
 # mailorc
-A WordPress/MailChimp Integration for Sci-Fi Authors.
+A WordPress/MailChimp integration to subscribe your MailChimp readers to interests using the MailChimp API.
 
 ## Purpose ##
-As a Science Fiction author, you need a way for your subscribers to indicate that they have already read a partiuclar book or books that are being advertised in a MailChimp campaign.  This WordPress plugin provides a convenient way to do that.
+As an email marketer, you need a way for your subscribers to indicate that they should be added to a particular interest.  This WordPress plugin provides a convenient way to do that.
 
 ## Theory of Operation ##
 This plugin offers a subsite settings page so you can specify a MailChimp API key and subsequently select a list from your MailChimp account.  Also, you can select what's called a "Campaign Landing Page" from your WordPress pages.

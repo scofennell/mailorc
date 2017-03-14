@@ -1,18 +1,18 @@
 <?php
 
 /**
- * A WordPress/MailChimp Integration for Sci-Fi Authors.
- *
+ * A WordPress/MailChimp integration to subscribe your MailChimp readers to interests using the MailChimp API.
+ * 
  * @package WordPress
  * @subpackage MailOrc
  * @since MailOrc 0.1
  * 
  * Plugin Name: MailOrc
- * Plugin URI: http://www.scottfennell.com
- * Description: A WordPress/MailChimp Integration for Sci-Fi Authors.
- * Author: Scott Fennell
- * Version: 0.7.1
- * Author URI: http://www.scottfennell.com
+ * Plugin URI: https://www.jzacharypike.com
+ * Description: A WordPress/MailChimp integration to subscribe your MailChimp readers to interests using the MailChimp API.
+ * Author: Scott Fennell & J. Zachary Pike
+ * Version: 0.8
+ * Author URI: https://www.jzacharypike.com
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as 
@@ -42,7 +42,7 @@ $mailorc = FALSE;
 define( 'MAILORC', 'mailorc' );
 
 // Establish a value for plugin version to bust file caches.
-define( 'MAILORC_VERSION', '0.7.1' );
+define( 'MAILORC_VERSION', '0.8' );
 
 // A constant to define the paths to our plugin folders.
 define( 'MAILORC_FILE', __FILE__ );
