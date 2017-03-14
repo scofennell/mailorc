@@ -1,6 +1,8 @@
 # mailorc
 A WordPress/MailChimp integration to subscribe your MailChimp readers to interests using the MailChimp API.
 
+![Logo](https://github.com/scofennell/mailorc/blob/master/img/mo-small.png?raw=true)
+
 ## Purpose ##
 As an email marketer, you need a way for your subscribers to indicate that they should be added to a particular interest.  This WordPress plugin provides a convenient way to do that.
 
